@@ -97,7 +97,7 @@ local function page(name)
 	local result = make("ScrollingFrame", {
 		Name = name, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1,
 		BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = C.accent,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), Visible = false,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.fromOffset(0, 0), Visible = false,
 	}, Content)
 	make("UIPadding", { PaddingTop = UDim.new(0, 24), PaddingBottom = UDim.new(0, 24), PaddingLeft = UDim.new(0, 28), PaddingRight = UDim.new(0, 28) }, result)
 	make("UIListLayout", { Padding = UDim.new(0, 12), SortOrder = Enum.SortOrder.LayoutOrder }, result)
