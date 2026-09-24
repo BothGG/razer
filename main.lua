@@ -11,6 +11,13 @@ local playerGui = player:WaitForChild("PlayerGui")
 local oldGui = playerGui:FindFirstChild("DeltaHub")
 if oldGui then oldGui:Destroy() end
 
+-- Prefer the executor's protected UI container when available, with PlayerGui as fallback.
+local guiParent = playerGui
+if type(gethui) == "function" then
+	local ok, protectedGui = pcall(gethui)
+	if ok and protectedGui then guiParent = protectedGui end
+end
+
 local C = {
 	bg = Color3.fromRGB(6, 8, 13),
 	panel = Color3.fromRGB(10, 14, 23),
@@ -54,7 +61,28 @@ local Gui = make("ScreenGui", {
 	Name = "DeltaHub",
 	ResetOnSpawn = false,
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-}, playerGui)
+}, guiParent)
+
+-- Boot screen: if construction stops early, this remains visible instead of failing silently.
+local Boot = make("Frame", {
+	AnchorPoint = Vector2.new(.5, .5),
+	Position = UDim2.fromScale(.5, .5),
+	Size = UDim2.fromOffset(300, 112),
+	BackgroundColor3 = C.panel,
+	ZIndex = 50,
+}, Gui)
+round(Boot, 10)
+outline(Boot, C.accent)
+local bootTitle = text(Boot, "DELTA HUB", 17, C.text, Enum.Font.GothamBold)
+bootTitle.Position, bootTitle.Size = UDim2.fromOffset(20, 18), UDim2.new(1, -40, 0, 25)
+bootTitle.ZIndex = 51
+local bootStatus = text(Boot, "INITIALIZING INTERFACE...", 10, C.muted, Enum.Font.GothamMedium)
+bootStatus.Position, bootStatus.Size = UDim2.fromOffset(21, 52), UDim2.new(1, -42, 0, 18)
+bootStatus.ZIndex = 51
+local bootBar = make("Frame", { Position = UDim2.fromOffset(20, 82), Size = UDim2.new(1, -40, 0, 4), BackgroundColor3 = C.line, BorderSizePixel = 0, ZIndex = 51 }, Boot)
+round(bootBar, 4)
+local bootProgress = make("Frame", { Size = UDim2.new(.35, 0, 1, 0), BackgroundColor3 = C.accent, BorderSizePixel = 0, ZIndex = 52 }, bootBar)
+round(bootProgress, 4)
 
 local Main = make("Frame", {
 	AnchorPoint = Vector2.new(.5, .5),
@@ -280,4 +308,9 @@ player.CharacterAdded:Connect(function()
 	flyObjects = {}
 end)
 
+bootStatus.Text = "READY  •  PRESS RIGHTSHIFT TO HIDE"
+bootStatus.TextColor3 = C.success
+bootProgress.Size = UDim2.fromScale(1, 1)
+task.wait(0.25)
+Boot:Destroy()
 notify("Delta Hub", "Ready. Press RightShift to hide or show.", C.success)
